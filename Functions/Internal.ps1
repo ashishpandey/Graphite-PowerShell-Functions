@@ -159,6 +159,36 @@ function PSUsing
     }
 }
 
+# PSUsing above doesn't work with powershell 2 for TCP/UDP client as dispose wan't exposed in .NET 2/3
+function Using-Closeable
+{
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyString()]
+        [AllowEmptyCollection()]
+        [AllowNull()]
+        [Object]
+        $InputObject,
+        
+        [Parameter(Mandatory = $true)]
+        [scriptblock]
+        $ScriptBlock
+    )
+    
+    try 
+    {
+        . $ScriptBlock
+    }
+    finally 
+    {
+        if ($null -ne $InputObject)
+        {
+            $InputObject.Close()
+        }
+    }
+}
+
 function SendMetrics
 {
     param (
@@ -175,8 +205,9 @@ function SendMetrics
         {
             if ($isUdp)
             {
-                PSUsing ($udpobject = new-Object system.Net.Sockets.Udpclient($CarbonServer, $CarbonServerPort)) -ScriptBlock {
+                Using-Closeable ($udpobject = new-Object system.Net.Sockets.Udpclient($CarbonServer, $CarbonServerPort)) -ScriptBlock {
                     $enc = new-object system.text.asciiencoding
+                    $Message = ""
                     foreach ($metricString in $Metrics)
                     {
                         $Message += "$($metricString)`n"
@@ -191,7 +222,7 @@ function SendMetrics
             }
             else
             {
-                PSUsing ($socket = New-Object System.Net.Sockets.TCPClient) -ScriptBlock {
+                Using-Closeable ($socket = New-Object System.Net.Sockets.TCPClient) -ScriptBlock {
                     $socket.connect($CarbonServer, $CarbonServerPort)
                     PSUsing ($stream = $socket.GetStream()) {
                         PSUSing($writer = new-object System.IO.StreamWriter($stream)) {
