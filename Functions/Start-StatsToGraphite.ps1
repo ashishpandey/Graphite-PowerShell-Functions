@@ -136,7 +136,7 @@ Function Start-StatsToGraphite
                 $filterStopWatch = [System.Diagnostics.Stopwatch]::StartNew()
 
                 # Check if there are filters or not
-                if ([string]::IsNullOrWhiteSpace($Config.Filters) -or $sample.Path -notmatch [regex]$Config.Filters)
+                if ([string]::IsNullOrEmpty($Config.Filters) -or $sample.Path -notmatch [regex]$Config.Filters)
                 {
                     # Run the sample path through the ConvertTo-GraphiteMetric function
                     $cleanNameOfSample = ConvertTo-GraphiteMetric -MetricToClean $sample.Path -HostName $Config.NodeHostName -MetricReplacementHash $Config.MetricReplace
@@ -177,8 +177,8 @@ Function Start-StatsToGraphite
                     }
 
                     # Run the Invoke-SqlCmd Cmdlet with a username and password only if they are present in the config file
-                    if (-not [string]::IsNullOrWhitespace($sqlServer.Username) `
-                        -and -not [string]::IsNullOrWhitespace($sqlServer.Password))
+                    if (-not [string]::IsNullOrEmpty($sqlServer.Username) `
+                        -and -not [string]::IsNullOrEmpty($sqlServer.Password))
                     {
                         $sqlCmdParams['Username'] = $sqlServer.Username
                         $sqlCmdParams['Password'] = $sqlServer.Password
