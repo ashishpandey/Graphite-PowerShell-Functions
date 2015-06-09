@@ -220,3 +220,8 @@ Send-GraphiteEvent | Sends an event to Graphite using the Graphite Event API. Mo
 Send-GraphiteMetric | Allows you to send metrics to Graphite in an ad-hoc manner.
 Start-SQLStatsToGraphite | The function to query SQL. This is an endless loop which will send metrics to Graphite.
 Start-StatsToGraphite | The function to collect Windows Performance Counters. This is an endless loop which will send metrics to Graphite.
+
+## <a name="compatibility">Compatibility Notes</a>
+
+This version is compatible with powershell 2 and 3
+
